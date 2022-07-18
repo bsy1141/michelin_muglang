@@ -40,13 +40,8 @@ const SideBar = ({
         serverUrl +
           `restaurants/search?page=1&pageSize=${perPage}&country=${countryName}&${selectedCategory}=${searchKeyword}`,
       );
-      console.log(
-        "get:" +
-          serverUrl +
-          `restaurants/search?page=1&pageSize=${perPage}&country=${countryName}&${selectedCategory}=${searchKeyword}`,
-      );
       const { data, last } = res.data;
-      if (data.length == 0) {
+      if (data.length === 0) {
         setNoResult(true);
       }
       setRestaurants(data);
@@ -87,36 +82,29 @@ const SideBar = ({
     }
   };
 
+  const fetchRestaurants = async () => {
+    // 검색 결과 리스트를 보고 있을 때와 전체 음식점 리스트를 보고 있을 때를 구분해줘야 함
+    if (onSearch) {
+      const res = await axios.get(
+        serverUrl +
+          `restaurants/search?page=${searchPage}&pageSize=${perPage}&country=${countryName}&${selectedCategory}=${searchKeyword}`,
+      );
+      const { data, last } = res.data;
+      setRestaurants(data);
+      setSearchTotalPage(last);
+    } else {
+      const res = await axios.get(
+        serverUrl +
+          `restaurants?country=${countryName}&page=${page}&pageSize=${perPage}`,
+      );
+      const { data, last } = res.data;
+      setRestaurantList(data);
+      setRestaurants(data);
+      setTotalPage(last);
+    }
+  };
+
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      // 검색 결과 리스트를 보고 있을 때와 전체 음식점 리스트를 보고 있을 때를 구분해줘야 함
-      if (onSearch) {
-        const res = await axios.get(
-          serverUrl +
-            `restaurants/search?page=${searchPage}&pageSize=${perPage}&country=${countryName}&${selectedCategory}=${searchKeyword}`,
-        );
-        console.log(
-          serverUrl +
-            `restaurants/search?page=${searchPage}&pageSize=${perPage}&country=${countryName}&${selectedCategory}=${searchKeyword}`,
-        );
-        const { data, last } = res.data;
-        setRestaurants(data);
-        setSearchTotalPage(last);
-      } else {
-        const res = await axios.get(
-          serverUrl +
-            `restaurants?country=${countryName}&page=${page}&pageSize=${perPage}`,
-        );
-        console.log(
-          serverUrl +
-            `restaurants?country=${countryName}&page=${page}&pageSize=${perPage}`,
-        );
-        const { data, last } = res.data;
-        setRestaurantList(data);
-        setRestaurants(data);
-        setTotalPage(last);
-      }
-    };
     fetchRestaurants();
   }, [page, searchPage]);
 
